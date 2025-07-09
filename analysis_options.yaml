@@ -1,0 +1,25 @@
+include: package:flutter_lints/flutter.yaml
+# This file is used to configure the Dart analyzer and linter rules for the project.
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_single_quotes: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_mixin: true
+    prefer_adjacent_string_concatenation: true
+    prefer_conditional_assignment: true
+    prefer_null_aware_method_calls: true
+    prefer_is_not_empty: true
+    prefer_is_empty: true
+    prefer_if_null_operators: true
+    prefer_interpolation_to_compose_strings: true
+    prefer_final_parameters: true
+    require_trailing_commas: true
+    always_specify_types: true
+    sort_child_properties_last: true
+    sort_constructors_first: true
+    avoid_redundant_argument_values: true
+    avoid_relative_lib_imports: true
+    implementation_imports: true
