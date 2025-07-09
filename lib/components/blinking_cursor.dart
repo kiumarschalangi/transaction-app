@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:transaction_app/constants/strings.dart' as strings;
 
 class BlinkingCursor extends StatefulWidget {
   const BlinkingCursor({super.key});
@@ -38,7 +39,7 @@ class _BlinkingCursorState extends State<BlinkingCursor> {
       style: const TextStyle(
         color: Color(0xFF00FF00),
         fontSize: 14,
-        fontFamily: 'Courier',
+        fontFamily: strings.fontFamily,
       ),
     );
   }
