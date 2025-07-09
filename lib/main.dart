@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:transaction_app/transfer_money_screen.dart';
+import 'package:transaction_app/screens/transfer_money_screen.dart';
 
 void main() {
   runApp(const RetroTerminalApp());
