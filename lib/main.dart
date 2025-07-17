@@ -15,6 +15,7 @@ class RetroTerminalApp extends StatelessWidget {
     return MaterialApp(
       title: strings.appTitle,
       debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: const ColorScheme.dark(primary: Color(0xFF00FF00)),

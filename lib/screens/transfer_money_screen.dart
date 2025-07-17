@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:transaction_app/constants/strings.dart' as strings;
@@ -28,12 +27,12 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
   Future<void> _callKafkaService(final String type) async {
     final String url =
         type == strings.deposit
-            ? 'http://10.0.2.2:8081/deposit'
-            : 'http://10.0.2.2:8082/withdraw';
+            ? 'http://10.0.2.2:8082/deposit'
+            : 'http://10.0.2.2:8083/withdraw';
 
     final Map<String, Object> payload = <String, Object>{
-      'userId': 'MOBILE_UI',
-      'amount': type == strings.deposit ? 500.0 : 250.0,
+      'accountId': 'MOBILE_UI',
+      'amount': type == strings.deposit ? 50 : 25,
     };
 
     setState(() {
@@ -66,7 +65,6 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
         _logs.add('> ${strings.error}: Request timed out.');
       });
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Request timed out. Please try again.')),
       );
@@ -75,7 +73,52 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
         _logs.add('> ${strings.error}: $e');
       });
       if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${strings.snackbarFailure}: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
+  Future<void> _getBalance() async {
+    const String url = 'http://10.0.2.2:8084/balance';
+
+    setState(() {
+      _isLoading = true;
+      _logs.add('> FETCHING BALANCE...');
+    });
+
+    try {
+      final http.Response response = await http
+          .get(Uri.parse(url))
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw TimeoutException('Request timed out');
+            },
+          );
+
+      final dynamic jsonResponse = jsonDecode(response.body);
+      setState(() {
+        _logs.add('> RESPONSE:');
+        _logs.add(const JsonEncoder.withIndent('  ').convert(jsonResponse));
+      });
+    } on TimeoutException catch (_) {
+      setState(() {
+        _logs.add('> ${strings.error}: Request timed out.');
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Request timed out. Please try again.')),
+      );
+    } catch (e) {
+      setState(() {
+        _logs.add('> ${strings.error}: $e');
+      });
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('${strings.snackbarFailure}: $e')));
@@ -113,11 +156,13 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                   strings.deposit,
                   () => _callKafkaService(strings.deposit),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 14),
                 _retroButton(
                   strings.withdraw,
                   () => _callKafkaService(strings.withdraw),
                 ),
+                const SizedBox(width: 14),
+                _retroButton('Balance', _getBalance),
               ],
             ),
             const SizedBox(height: 20),
@@ -268,7 +313,7 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF333333),
         foregroundColor: const Color(0xFF00FF00),
-        minimumSize: const Size(140, 50),
+        minimumSize: const Size(120, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         side: const BorderSide(color: Color(0xFF00FF00)),
       ),
