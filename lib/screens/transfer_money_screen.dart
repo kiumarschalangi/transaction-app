@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:transaction_app/constants/strings.dart' as strings;
 import 'dart:convert';
-import 'package:transaction_app/blinking_cursor.dart';
-import 'package:transaction_app/terminal_window_circular_button.dart';
+import 'package:transaction_app/components/blinking_cursor.dart';
+import 'package:transaction_app/components/terminal_window_circular_button.dart';
 
 class TransferMoneyScreen extends StatefulWidget {
   const TransferMoneyScreen({super.key});
@@ -20,19 +20,19 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
   void _clearLogs() {
     setState(() {
       _logs.clear();
-      _logs.add('> TERMINAL CLEARED');
+      _logs.add(strings.terminalCleared);
     });
   }
 
   Future<void> _callKafkaService(final String type) async {
     final String url =
-        type == 'deposit'
-            ? 'http://10.0.2.2:8081/deposit'
-            : 'http://10.0.2.2:8082/withdraw';
+        type == strings.deposit
+            ? 'http://10.0.2.2:8082/deposit'
+            : 'http://10.0.2.2:8083/withdraw';
 
     final Map<String, Object> payload = <String, Object>{
-      'userId': 'MOBILE_UI',
-      'amount': type == 'deposit' ? 500.0 : 250.0,
+      'accountId': 'MOBILE_UI',
+      'amount': type == strings.deposit ? 50 : 25,
     };
 
     setState(() {
@@ -62,22 +62,66 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
       });
     } on TimeoutException catch (_) {
       setState(() {
-        _logs.add('> ERROR: Request timed out.');
+        _logs.add('> ${strings.error}: Request timed out.');
       });
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Request timed out. Please try again.')),
       );
     } catch (e) {
       setState(() {
-        _logs.add('> ERROR: $e');
+        _logs.add('> ${strings.error}: $e');
       });
       if (!mounted) return;
-
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Request failed: $e')));
+      ).showSnackBar(SnackBar(content: Text('${strings.snackbarFailure}: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _getBalance() async {
+    const String url = 'http://10.0.2.2:8084/balance';
+
+    setState(() {
+      _isLoading = true;
+      _logs.add('> FETCHING BALANCE...');
+    });
+
+    try {
+      final http.Response response = await http
+          .get(Uri.parse(url))
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw TimeoutException('Request timed out');
+            },
+          );
+
+      final dynamic jsonResponse = jsonDecode(response.body);
+      setState(() {
+        _logs.add('> RESPONSE:');
+        _logs.add(const JsonEncoder.withIndent('  ').convert(jsonResponse));
+      });
+    } on TimeoutException catch (_) {
+      setState(() {
+        _logs.add('> ${strings.error}: Request timed out.');
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Request timed out. Please try again.')),
+      );
+    } catch (e) {
+      setState(() {
+        _logs.add('> ${strings.error}: $e');
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${strings.snackbarFailure}: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -92,10 +136,10 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF222222),
         title: const Text(
-          'RETRO KAFKA PROJECT v1.0',
+          strings.appBarTitle,
           style: TextStyle(
             color: Color(0xFF00FF00),
-            fontFamily: 'Courier',
+            fontFamily: strings.fontFamily,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -108,9 +152,17 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                _retroButton('DEPOSIT', () => _callKafkaService('deposit')),
-                const SizedBox(width: 20),
-                _retroButton('WITHDRAW', () => _callKafkaService('withdraw')),
+                _retroButton(
+                  strings.deposit,
+                  () => _callKafkaService(strings.deposit),
+                ),
+                const SizedBox(width: 14),
+                _retroButton(
+                  strings.withdraw,
+                  () => _callKafkaService(strings.withdraw),
+                ),
+                const SizedBox(width: 14),
+                _retroButton('Balance', _getBalance),
               ],
             ),
             const SizedBox(height: 20),
@@ -147,10 +199,10 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                           const Expanded(
                             child: Center(
                               child: Text(
-                                'TERMINAL',
+                                strings.terminalTitle,
                                 style: TextStyle(
                                   color: Color(0xFFCCCCCC),
-                                  fontFamily: 'Courier',
+                                  fontFamily: strings.fontFamily,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -172,10 +224,10 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                                 ),
                               ),
                               child: const Text(
-                                'CLEAR',
+                                strings.clearButton,
                                 style: TextStyle(
                                   color: Color(0xFFCCCCCC),
-                                  fontFamily: 'Courier',
+                                  fontFamily: strings.fontFamily,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -203,7 +255,7 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                                         ? const Color(0xFF00FF00)
                                         : const Color(0xFFCCCCCC),
                                 fontSize: 14,
-                                fontFamily: 'Courier',
+                                fontFamily: strings.fontFamily,
                               ),
                             ),
                           );
@@ -216,11 +268,11 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                         child: Row(
                           children: <Widget>[
                             Text(
-                              '> ',
+                              strings.terminalPrompt,
                               style: TextStyle(
                                 color: Color(0xFF00FF00),
                                 fontSize: 14,
-                                fontFamily: 'Courier',
+                                fontFamily: strings.fontFamily,
                               ),
                             ),
                             BlinkingCursor(),
@@ -240,11 +292,11 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
               ),
               child: const Center(
                 child: Text(
-                  '© 2025 BY KIUMARS CHAHARLANGI',
+                  strings.copyright,
                   style: TextStyle(
                     color: Color(0xFF888888),
                     fontSize: 12,
-                    fontFamily: 'Courier',
+                    fontFamily: strings.fontFamily,
                   ),
                 ),
               ),
@@ -261,7 +313,7 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF333333),
         foregroundColor: const Color(0xFF00FF00),
-        minimumSize: const Size(140, 50),
+        minimumSize: const Size(120, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         side: const BorderSide(color: Color(0xFF00FF00)),
       ),
@@ -279,7 +331,7 @@ class _TransferMoneyScreenState extends State<TransferMoneyScreen> {
                 label,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Courier',
+                  fontFamily: strings.fontFamily,
                   fontWeight: FontWeight.bold,
                 ),
               ),
