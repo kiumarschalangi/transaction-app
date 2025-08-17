@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:transaction_app/screens/transfer_money_screen.dart';
+import 'package:transaction_app/screens/transfer_money/transfer_money_screen.dart';
 import 'package:transaction_app/constants/strings.dart' as strings;
 
 void main() {
