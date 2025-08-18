@@ -1,9 +1,10 @@
-import 'package:http/http.dart' as http;
-import 'package:transaction_app/constants/strings.dart' as strings;
+// transfer_money_cubit.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:transaction_app/constants/strings.dart' as strings;
+import 'package:transaction_app/constants/enums/http_methods.dart';
 import 'package:transaction_app/screens/transfer_money/cubit/transfer_money_state.dart';
 
 class TransferMoneyCubit extends Cubit<TransferMoneyState> {
@@ -11,6 +12,14 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
 
   void clearLogs() {
     emit(state.copyWith(logs: <String>[strings.terminalCleared]));
+  }
+
+  void updateUrl(final String url) {
+    emit(state.copyWith(url: url));
+  }
+
+  void updateHttpMethod(final HttpMethod method) {
+    emit(state.copyWith(selectedMethod: method));
   }
 
   void _addLog(final String log) {
@@ -28,74 +37,101 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
     emit(state.copyWith(isLoading: loading));
   }
 
-  Future<void> callKafkaService(final String type) async {
-    final String url =
-        type == strings.deposit
-            ? 'http://10.0.2.2:8082/deposit'
-            : 'http://10.0.2.2:8083/withdraw';
+  Future<void> executeRequest() async {
+    if (state.url.isEmpty) {
+      _addLog('> ${strings.error}: URL cannot be empty');
+      return;
+    }
 
-    final Map<String, Object> payload = <String, Object>{
-      'accountId': 'MOBILE_UI',
-      'amount': type == strings.deposit ? 50 : 25,
-    };
+    Uri uri;
+    try {
+      uri = Uri.parse(state.url);
+    } catch (e) {
+      _addLog('> ${strings.error}: Invalid URL format');
+      return;
+    }
 
     _setLoading(true);
     _addLogs(<String>[
-      '> SENDING $type TO KAFKA SERVICE...',
-      '> REQUEST PAYLOAD:',
-      const JsonEncoder.withIndent('  ').convert(payload),
+      '> EXECUTING ${state.selectedMethod.name} REQUEST...',
+      '> URL: ${state.url}',
     ]);
 
     try {
-      final http.Response response = await http
-          .post(
-            Uri.parse(url),
-            headers: <String, String>{'Content-Type': 'application/json'},
-            body: jsonEncode(payload),
-          )
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () {
-              throw TimeoutException('Request timed out');
-            },
-          );
+      http.Response response;
+
+      switch (state.selectedMethod) {
+        case HttpMethod.get:
+          response = await http
+              .get(uri)
+              .timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => throw TimeoutException('Request timed out'),
+              );
+          break;
+        case HttpMethod.post:
+          response = await http
+              .post(
+                uri,
+                headers: <String, String>{'Content-Type': 'application/json'},
+                body: jsonEncode(<dynamic, dynamic>{}), // Empty body for now
+              )
+              .timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => throw TimeoutException('Request timed out'),
+              );
+          break;
+        case HttpMethod.put:
+          response = await http
+              .put(
+                uri,
+                headers: <String, String>{'Content-Type': 'application/json'},
+                body: jsonEncode(<dynamic, dynamic>{}),
+              )
+              .timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => throw TimeoutException('Request timed out'),
+              );
+          break;
+        case HttpMethod.patch:
+          response = await http
+              .patch(
+                uri,
+                headers: <String, String>{'Content-Type': 'application/json'},
+                body: jsonEncode(<dynamic, dynamic>{}),
+              )
+              .timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => throw TimeoutException('Request timed out'),
+              );
+          break;
+        case HttpMethod.delete:
+          response = await http
+              .delete(uri)
+              .timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => throw TimeoutException('Request timed out'),
+              );
+          break;
+      }
 
       _addLogs(<String>[
-        '> RESPONSE: ${response.body}',
-        '> $type REQUEST COMPLETE',
+        '> STATUS CODE: ${response.statusCode}',
+        '> RESPONSE HEADERS:',
+        const JsonEncoder.withIndent('  ').convert(response.headers),
+        '> RESPONSE BODY:',
       ]);
-    } on TimeoutException catch (_) {
-      _addLog('> ${strings.error}: Request timed out.');
-      throw TimeoutException('Request timed out. Please try again.');
-    } catch (e) {
-      _addLog('> ${strings.error}: $e');
-      rethrow;
-    } finally {
-      _setLoading(false);
-    }
-  }
 
-  Future<void> getBalance() async {
-    const String url = 'http://10.0.2.2:8084/balance';
+      // Try to format JSON response
+      try {
+        final dynamic jsonResponse = jsonDecode(response.body);
+        _addLog(const JsonEncoder.withIndent('  ').convert(jsonResponse));
+      } catch (_) {
+        // If not JSON, just show raw body
+        _addLog(response.body);
+      }
 
-    _setLoading(true);
-    _addLog('> FETCHING BALANCE...');
-
-    try {
-      final http.Response response = await http
-          .get(Uri.parse(url))
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () {
-              throw TimeoutException('Request timed out');
-            },
-          );
-
-      final dynamic jsonResponse = jsonDecode(response.body);
-      _addLogs(<String>[
-        '> RESPONSE:',
-        const JsonEncoder.withIndent('  ').convert(jsonResponse),
-      ]);
+      _addLog('> REQUEST COMPLETE');
     } on TimeoutException catch (_) {
       _addLog('> ${strings.error}: Request timed out.');
       throw TimeoutException('Request timed out. Please try again.');
