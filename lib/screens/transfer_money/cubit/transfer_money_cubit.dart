@@ -31,11 +31,11 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
   Future<void> callKafkaService(final String type) async {
     final String url =
         type == strings.deposit
-            ? 'http://10.0.2.2:8082/deposit'
-            : 'http://10.0.2.2:8083/withdraw';
+            ? 'https://deposit.unimi-projects.work/deposit'
+            : 'https://withdraw.unimi-projects.work/withdraw';
 
     final Map<String, Object> payload = <String, Object>{
-      'accountId': 'MOBILE_UI',
+      'userId': 'MOBILE_UI',
       'amount': type == strings.deposit ? 50 : 25,
     };
 
@@ -76,7 +76,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
   }
 
   Future<void> getBalance() async {
-    const String url = 'http://10.0.2.2:8084/balance';
+    const String url = 'https://account.unimi-projects.work/balance';
 
     _setLoading(true);
     _addLog('> FETCHING BALANCE...');

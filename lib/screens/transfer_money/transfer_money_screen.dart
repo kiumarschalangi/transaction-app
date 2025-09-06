@@ -1,5 +1,3 @@
-// transfer_money_screen.dart
-
 import 'package:transaction_app/constants/strings.dart' as strings;
 import 'package:transaction_app/constants/colors.dart' as colors;
 import 'package:flutter/material.dart';
