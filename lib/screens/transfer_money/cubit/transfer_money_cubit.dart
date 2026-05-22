@@ -80,7 +80,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               .get(uri)
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException('Request timed out'),
+                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.post:
@@ -88,12 +88,12 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .post(
                 uri,
-                headers: <String, String>{'Content-Type': 'application/json'},
+                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException('Request timed out'),
+                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.put:
@@ -101,12 +101,12 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .put(
                 uri,
-                headers: <String, String>{'Content-Type': 'application/json'},
+                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException('Request timed out'),
+                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.patch:
@@ -114,12 +114,12 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .patch(
                 uri,
-                headers: <String, String>{'Content-Type': 'application/json'},
+                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException('Request timed out'),
+                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.delete:
@@ -127,7 +127,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               .delete(uri)
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException('Request timed out'),
+                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
       }
@@ -148,8 +148,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
 
       _addLog('> REQUEST COMPLETE');
     } on TimeoutException catch (_) {
-      _addLog('> ${AppStrings.error}: Request timed out.');
-      throw TimeoutException('Request timed out. Please try again.');
+      _addLog(AppStrings.requestTimeoutError);
+      throw TimeoutException(AppStrings.snackbarTimeout);
     } catch (e) {
       _addLog('> ${AppStrings.error}: $e');
       rethrow;
