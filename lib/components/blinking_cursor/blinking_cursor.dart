@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transaction_app/components/blinking_cursor/cubit/blinking_cursor_cubit.dart';
-import 'package:transaction_app/constants/strings.dart' as strings;
+import 'package:transaction_app/constants/strings.dart';
+import 'package:flutter/widget_previews.dart';
 
 class BlinkingCursor extends StatelessWidget {
   const BlinkingCursor({super.key});
@@ -27,10 +28,13 @@ class _BlinkingCursorView extends StatelessWidget {
           style: const TextStyle(
             color: Color(0xFF00FF00),
             fontSize: 14,
-            fontFamily: strings.fontFamily,
+            fontFamily: AppStrings.fontFamily,
           ),
         );
       },
     );
   }
 }
+
+@Preview(name: ' cursor')
+Widget defaultCursor() => const BlinkingCursor();
