@@ -6,8 +6,11 @@ abstract final class AppStrings {
   static const String requestPayload = '> REQUEST PAYLOAD:';
   static const String response = '> RESPONSE: {response}';
   static const String requestComplete = '> {type} REQUEST COMPLETE';
+  static const String requestTimedOut = 'Request timed out';
   static const String requestTimeoutError = '> ERROR: Request timed out.';
   static const String snackbarTimeout = 'Request timed out. Please try again.';
+  static const String contentType = 'Content-Type';
+  static const String applicationJson = 'application/json';
   static const String error = '> ERROR';
   static const String snackbarFailure = 'Request failed';
   static const String appBarTitle = 'RETRO KAFKA PROJECT v1.0';
