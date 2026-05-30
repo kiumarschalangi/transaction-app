@@ -123,7 +123,8 @@ class _RequestBodyButton extends StatelessWidget {
           child: OutlinedButton(
             onPressed: () => _showRequestBodyDialog(context, state.requestBody),
             style: OutlinedButton.styleFrom(
-              backgroundColor: hasBody ? AppColors.background : Colors.transparent,
+              backgroundColor:
+                  hasBody ? AppColors.background : Colors.transparent,
               foregroundColor: AppColors.primary,
               minimumSize: const Size(0, 45),
               shape: RoundedRectangleBorder(
@@ -454,7 +455,8 @@ class _LogEntry extends StatelessWidget {
       child: Text(
         log,
         style: TextStyle(
-          color: log.startsWith('>') ? AppColors.primary : const Color(0xFFCCCCCC),
+          color:
+              log.startsWith('>') ? AppColors.primary : const Color(0xFFCCCCCC),
           fontSize: 14,
           fontFamily: AppStrings.fontFamily,
         ),
@@ -560,9 +562,7 @@ class _RequestBodyDialogState extends State<_RequestBodyDialog> {
             Container(
               padding: const EdgeInsets.only(bottom: 16),
               decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: AppColors.border),
-                ),
+                border: Border(bottom: BorderSide(color: AppColors.border)),
               ),
               child: Row(
                 children: <Widget>[
@@ -689,7 +689,10 @@ class _RequestBodyDialogState extends State<_RequestBodyDialog> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      side: const BorderSide(color: AppColors.primary, width: 2),
+                      side: const BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
                     ),
                     child: const Text(
                       'ADD',
