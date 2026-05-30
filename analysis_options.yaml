@@ -1,5 +1,4 @@
 include: package:flutter_lints/flutter.yaml
-# This file is used to configure the Dart analyzer and linter rules for the project.
 
 linter:
   rules:
@@ -16,10 +15,11 @@ linter:
     prefer_if_null_operators: true
     prefer_interpolation_to_compose_strings: true
     prefer_final_parameters: true
+    prefer_final_locals: true
     require_trailing_commas: true
-    always_specify_types: true
     sort_child_properties_last: true
     sort_constructors_first: true
     avoid_redundant_argument_values: true
     avoid_relative_lib_imports: true
     implementation_imports: true
+    use_super_parameters: true
