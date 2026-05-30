@@ -34,5 +34,11 @@ class TransferMoneyState extends Equatable {
   }
 
   @override
-  List<Object> get props => <Object>[logs, isLoading, selectedMethod, url, requestBody]; // ← ADD requestBody
+  List<Object> get props => <Object>[
+    logs,
+    isLoading,
+    selectedMethod,
+    url,
+    requestBody,
+  ]; // ← ADD requestBody
 }

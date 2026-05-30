@@ -80,7 +80,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               .get(uri)
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
+                onTimeout:
+                    () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.post:
@@ -88,12 +89,15 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .post(
                 uri,
-                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
+                headers: <String, String>{
+                  AppStrings.contentType: AppStrings.applicationJson,
+                },
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
+                onTimeout:
+                    () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.put:
@@ -101,12 +105,15 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .put(
                 uri,
-                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
+                headers: <String, String>{
+                  AppStrings.contentType: AppStrings.applicationJson,
+                },
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
+                onTimeout:
+                    () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.patch:
@@ -114,12 +121,15 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           response = await http
               .patch(
                 uri,
-                headers: <String, String>{AppStrings.contentType: AppStrings.applicationJson},
+                headers: <String, String>{
+                  AppStrings.contentType: AppStrings.applicationJson,
+                },
                 body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
               )
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
+                onTimeout:
+                    () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
         case HttpMethod.delete:
@@ -127,7 +137,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               .delete(uri)
               .timeout(
                 const Duration(seconds: 10),
-                onTimeout: () => throw TimeoutException(AppStrings.requestTimedOut),
+                onTimeout:
+                    () => throw TimeoutException(AppStrings.requestTimedOut),
               );
           break;
       }
