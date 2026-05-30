@@ -24,6 +24,8 @@ jobs:
 
       - name: Label by files
         uses: actions/labeler@v5
+        with:
+           configuration-path: .github/labeler.yaml
 
       - name: Label PR size
         uses: pascalgn/size-label-action@v0.5.5
