@@ -1,0 +1,24 @@
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "lib/**/*.dart"
+
+android:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "android/**"
+
+ios:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "ios/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
