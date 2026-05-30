@@ -38,14 +38,6 @@ flutter pub get
 flutter run
 ```
 
-## Screenshots
-
-> Add screenshot files to the `screenshots/` folder and update these links if needed.
-
-![Transfer Money Screen](screenshots/transfer_money_screen.png)
-
-![Request Body Dialog](screenshots/request_body_dialog.png)
-
 ## Project Structure
 
 - `lib/main.dart` - App entrypoint and theme configuration
