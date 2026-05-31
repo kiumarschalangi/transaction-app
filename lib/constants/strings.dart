@@ -20,4 +20,10 @@ abstract final class AppStrings {
   static const String deposit = 'DEPOSIT';
   static const String withdraw = 'WITHDRAW';
   static const String terminalPrompt = '> ';
+  static const String menuButton = '[MENU]';
+  static const String settingsTitle = 'SETTINGS';
+  static const String lightModeLabel = 'LIGHT MODE';
+  static const String asciiSwitchOn = '[====ON ]';
+  static const String asciiSwitchOff = '[ OFF===]';
+  static const String themePrefsKey = 'is_light_mode';
 }
