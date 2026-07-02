@@ -16,7 +16,7 @@ abstract final class AppStrings {
   static const String appBarTitle = 'RETRO KAFKA PROJECT v1.0';
   static const String terminalTitle = 'TERMINAL';
   static const String clearButton = 'CLEAR';
-  static const String copyright = '© 2025 BY KIUMARS CHAHARLANGI';
+  static const String copyright = '© 2025 · KIUMARS CHAHARLANGI';
   static const String deposit = 'DEPOSIT';
   static const String withdraw = 'WITHDRAW';
   static const String terminalPrompt = '> ';
@@ -26,4 +26,8 @@ abstract final class AppStrings {
   static const String asciiSwitchOn = '[====ON ]';
   static const String asciiSwitchOff = '[ OFF===]';
   static const String themePrefsKey = 'is_light_mode';
+  static const String devToolsLabel = 'DEV TOOLS';
+  static const String devToolsTitle = 'DEV TOOLS v1.0';
+  static const String devModeBadge = 'DEBUG MODE — NOT FOR PRODUCTION';
+  static const String devPresetsLabel = 'TEST PRESETS';
 }

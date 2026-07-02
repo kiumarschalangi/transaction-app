@@ -1,18 +1,32 @@
-// transfer_money_cubit.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:transaction_app/constants/enums/http_methods.dart';
-
 import 'package:transaction_app/constants/strings.dart';
 import 'package:transaction_app/screens/transfer_money/cubit/transfer_money_state.dart';
 
 class TransferMoneyCubit extends Cubit<TransferMoneyState> {
-  TransferMoneyCubit() : super(const TransferMoneyState());
+  TransferMoneyCubit()
+    : super(
+        const TransferMoneyState(
+          logs: <LogEntry>[
+            LogEntry(
+              kind: LogKind.info,
+              text: '> SYSTEM ONLINE · AWAITING REQUEST',
+            ),
+          ],
+        ),
+      );
 
   void clearLogs() {
-    emit(state.copyWith(logs: <String>[AppStrings.terminalCleared]));
+    emit(
+      state.copyWith(
+        logs: const <LogEntry>[
+          LogEntry(kind: LogKind.info, text: '> TERMINAL CLEARED'),
+        ],
+      ),
+    );
   }
 
   void updateUrl(final String url) {
@@ -20,21 +34,25 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
   }
 
   void updateHttpMethod(final HttpMethod method) {
-    emit(state.copyWith(selectedMethod: method));
+    emit(state.copyWith(selectedMethod: method, isBodyVisible: false));
   }
 
-  // ← ADD THIS METHOD
   void updateRequestBody(final String body) {
     emit(state.copyWith(requestBody: body));
   }
 
-  void _addLog(final String log) {
-    final List<String> updatedLogs = List<String>.from(state.logs)..add(log);
+  void toggleBodyVisibility() {
+    emit(state.copyWith(isBodyVisible: !state.isBodyVisible));
+  }
+
+  void _addLog(final LogEntry log) {
+    final List<LogEntry> updatedLogs = List<LogEntry>.from(state.logs)
+      ..add(log);
     emit(state.copyWith(logs: updatedLogs));
   }
 
-  void _addLogs(final List<String> logs) {
-    final List<String> updatedLogs = List<String>.from(state.logs)
+  void _addLogs(final List<LogEntry> logs) {
+    final List<LogEntry> updatedLogs = List<LogEntry>.from(state.logs)
       ..addAll(logs);
     emit(state.copyWith(logs: updatedLogs));
   }
@@ -45,7 +63,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
 
   Future<void> executeRequest() async {
     if (state.url.isEmpty) {
-      _addLog('> ${AppStrings.error}: URL cannot be empty');
+      _addLog(const LogEntry(kind: LogKind.err, text: '✕ NO URL PROVIDED'));
       return;
     }
 
@@ -53,26 +71,27 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
     try {
       uri = Uri.parse(state.url);
     } catch (e) {
-      _addLog('> ${AppStrings.error}: Invalid URL format');
+      _addLog(const LogEntry(kind: LogKind.err, text: '✕ INVALID URL FORMAT'));
       return;
     }
 
     _setLoading(true);
-    _addLogs(<String>[
-      '> EXECUTING ${state.selectedMethod.name} REQUEST...',
-      '> URL: ${state.url}',
-    ]);
+    _addLog(
+      LogEntry(
+        kind: LogKind.cmd,
+        text: '> ${state.selectedMethod.name.toUpperCase()} ${state.url}',
+      ),
+    );
 
-    // ← ADD THIS: Log request body if present
-    if (state.requestBody.isNotEmpty &&
-        (state.selectedMethod == HttpMethod.post ||
-            state.selectedMethod == HttpMethod.put ||
-            state.selectedMethod == HttpMethod.patch)) {
-      _addLogs(<String>['> REQUEST BODY:', state.requestBody]);
-    }
+    final Stopwatch stopwatch = Stopwatch()..start();
 
     try {
       http.Response response;
+      final Map<String, String> jsonHeaders = <String, String>{
+        AppStrings.contentType: AppStrings.applicationJson,
+      };
+      final String body =
+          state.requestBody.isNotEmpty ? state.requestBody : '{}';
 
       switch (state.selectedMethod) {
         case HttpMethod.get:
@@ -85,15 +104,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               );
           break;
         case HttpMethod.post:
-          // ← MODIFY THIS: Use actual request body
           response = await http
-              .post(
-                uri,
-                headers: <String, String>{
-                  AppStrings.contentType: AppStrings.applicationJson,
-                },
-                body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
-              )
+              .post(uri, headers: jsonHeaders, body: body)
               .timeout(
                 const Duration(seconds: 10),
                 onTimeout:
@@ -101,15 +113,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               );
           break;
         case HttpMethod.put:
-          // ← MODIFY THIS: Use actual request body
           response = await http
-              .put(
-                uri,
-                headers: <String, String>{
-                  AppStrings.contentType: AppStrings.applicationJson,
-                },
-                body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
-              )
+              .put(uri, headers: jsonHeaders, body: body)
               .timeout(
                 const Duration(seconds: 10),
                 onTimeout:
@@ -117,15 +122,8 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
               );
           break;
         case HttpMethod.patch:
-          // ← MODIFY THIS: Use actual request body
           response = await http
-              .patch(
-                uri,
-                headers: <String, String>{
-                  AppStrings.contentType: AppStrings.applicationJson,
-                },
-                body: state.requestBody.isNotEmpty ? state.requestBody : '{}',
-              )
+              .patch(uri, headers: jsonHeaders, body: body)
               .timeout(
                 const Duration(seconds: 10),
                 onTimeout:
@@ -143,26 +141,53 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           break;
       }
 
-      _addLogs(<String>[
-        '> STATUS CODE: ${response.statusCode}',
-        '> RESPONSE HEADERS:',
-        const JsonEncoder.withIndent('  ').convert(response.headers),
-        '> RESPONSE BODY:',
-      ]);
+      stopwatch.stop();
+      final int ms = stopwatch.elapsedMilliseconds;
+      final int code = response.statusCode;
+      final String reason = response.reasonPhrase ?? '';
+      final String statusLine = '< $code $reason  ·  $ms ms'.trim();
+      final String contentType = response.headers['content-type'] ?? '';
+
+      final LogKind statusKind = switch (code) {
+        >= 200 && < 300 => LogKind.status2,
+        >= 300 && < 400 => LogKind.status3,
+        >= 400 && < 500 => LogKind.status4,
+        _ => LogKind.status5,
+      };
+
+      final List<LogEntry> responseLogs = <LogEntry>[
+        LogEntry(kind: statusKind, text: statusLine),
+        if (contentType.isNotEmpty)
+          LogEntry(kind: LogKind.header, text: 'content-type: $contentType'),
+      ];
 
       try {
         final dynamic jsonResponse = jsonDecode(response.body);
-        _addLog(const JsonEncoder.withIndent('  ').convert(jsonResponse));
+        responseLogs.add(
+          LogEntry(
+            kind: LogKind.body,
+            text: const JsonEncoder.withIndent('  ').convert(jsonResponse),
+          ),
+        );
       } catch (_) {
-        _addLog(response.body);
+        if (response.body.isNotEmpty) {
+          responseLogs.add(LogEntry(kind: LogKind.body, text: response.body));
+        } else {
+          responseLogs.add(
+            const LogEntry(kind: LogKind.info, text: '(empty response body)'),
+          );
+        }
       }
 
-      _addLog('> REQUEST COMPLETE');
+      _addLogs(responseLogs);
     } on TimeoutException catch (_) {
-      _addLog(AppStrings.requestTimeoutError);
+      _addLog(const LogEntry(kind: LogKind.err, text: '✕ REQUEST TIMED OUT'));
       throw TimeoutException(AppStrings.snackbarTimeout);
     } catch (e) {
-      _addLog('> ${AppStrings.error}: $e');
+      _addLogs(<LogEntry>[
+        const LogEntry(kind: LogKind.err, text: '✕ REQUEST FAILED'),
+        LogEntry(kind: LogKind.info, text: '  $e'),
+      ]);
       rethrow;
     } finally {
       _setLoading(false);
