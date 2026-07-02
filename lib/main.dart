@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:transaction_app/constants/colors.dart';
 import 'package:transaction_app/constants/strings.dart';
 import 'package:transaction_app/cubits/theme/theme_cubit.dart';
@@ -26,6 +27,8 @@ class RetroTerminalApp extends StatelessWidget {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (final BuildContext context, final ThemeState state) {
         final bool isLight = state.isLightMode;
+        final TextTheme baseTextTheme =
+            isLight ? ThemeData.light().textTheme : ThemeData.dark().textTheme;
         return MaterialApp(
           title: AppStrings.appTitle,
           debugShowCheckedModeBanner: false,
@@ -37,12 +40,13 @@ class RetroTerminalApp extends StatelessWidget {
                       primary: AppTheme.lightPrimary,
                     ),
                     scaffoldBackgroundColor: AppTheme.lightScaffold,
-                    fontFamily: AppStrings.fontFamily,
-                    snackBarTheme: const SnackBarThemeData(
+                    textTheme: GoogleFonts.jetBrainsMonoTextTheme(
+                      baseTextTheme,
+                    ),
+                    snackBarTheme: SnackBarThemeData(
                       backgroundColor: AppTheme.lightSurface,
-                      contentTextStyle: TextStyle(
+                      contentTextStyle: GoogleFonts.jetBrainsMono(
                         color: AppTheme.lightSubtext,
-                        fontFamily: AppStrings.fontFamily,
                       ),
                     ),
                   )
@@ -52,12 +56,13 @@ class RetroTerminalApp extends StatelessWidget {
                       primary: AppTheme.darkPrimary,
                     ),
                     scaffoldBackgroundColor: AppTheme.darkScaffold,
-                    fontFamily: AppStrings.fontFamily,
-                    snackBarTheme: const SnackBarThemeData(
+                    textTheme: GoogleFonts.jetBrainsMonoTextTheme(
+                      baseTextTheme,
+                    ),
+                    snackBarTheme: SnackBarThemeData(
                       backgroundColor: AppTheme.darkSurface,
-                      contentTextStyle: TextStyle(
+                      contentTextStyle: GoogleFonts.jetBrainsMono(
                         color: AppTheme.darkSubtext,
-                        fontFamily: AppStrings.fontFamily,
                       ),
                     ),
                   ),
