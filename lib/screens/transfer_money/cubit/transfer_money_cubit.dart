@@ -11,10 +11,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
     : super(
         const TransferMoneyState(
           logs: <LogEntry>[
-            LogEntry(
-              kind: LogKind.info,
-              text: '> SYSTEM ONLINE · AWAITING REQUEST',
-            ),
+            LogEntry(kind: LogKind.info, text: AppStrings.systemOnline),
           ],
         ),
       );
@@ -23,7 +20,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
     emit(
       state.copyWith(
         logs: const <LogEntry>[
-          LogEntry(kind: LogKind.info, text: '> TERMINAL CLEARED'),
+          LogEntry(kind: LogKind.info, text: AppStrings.terminalCleared),
         ],
       ),
     );
@@ -63,7 +60,7 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
 
   Future<void> executeRequest() async {
     if (state.url.isEmpty) {
-      _addLog(const LogEntry(kind: LogKind.err, text: '✕ NO URL PROVIDED'));
+      _addLog(const LogEntry(kind: LogKind.err, text: AppStrings.noUrlError));
       return;
     }
 
@@ -71,7 +68,9 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
     try {
       uri = Uri.parse(state.url);
     } catch (e) {
-      _addLog(const LogEntry(kind: LogKind.err, text: '✕ INVALID URL FORMAT'));
+      _addLog(
+        const LogEntry(kind: LogKind.err, text: AppStrings.invalidUrlError),
+      );
       return;
     }
 
@@ -174,18 +173,23 @@ class TransferMoneyCubit extends Cubit<TransferMoneyState> {
           responseLogs.add(LogEntry(kind: LogKind.body, text: response.body));
         } else {
           responseLogs.add(
-            const LogEntry(kind: LogKind.info, text: '(empty response body)'),
+            const LogEntry(
+              kind: LogKind.info,
+              text: AppStrings.emptyResponseBody,
+            ),
           );
         }
       }
 
       _addLogs(responseLogs);
     } on TimeoutException catch (_) {
-      _addLog(const LogEntry(kind: LogKind.err, text: '✕ REQUEST TIMED OUT'));
+      _addLog(
+        const LogEntry(kind: LogKind.err, text: AppStrings.requestTimedOutLog),
+      );
       throw TimeoutException(AppStrings.snackbarTimeout);
     } catch (e) {
       _addLogs(<LogEntry>[
-        const LogEntry(kind: LogKind.err, text: '✕ REQUEST FAILED'),
+        const LogEntry(kind: LogKind.err, text: AppStrings.requestFailedLog),
         LogEntry(kind: LogKind.info, text: '  $e'),
       ]);
       rethrow;

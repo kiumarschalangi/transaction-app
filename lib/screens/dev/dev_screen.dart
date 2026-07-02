@@ -317,7 +317,7 @@ class _DevUrlTextFieldState extends State<_DevUrlTextField> {
           fontSize: 14,
         ),
         decoration: InputDecoration(
-          hintText: 'Enter URL',
+          hintText: AppStrings.devUrlHint,
           hintStyle: TextStyle(
             color: AppTheme.hint(isLight),
             fontFamily: AppStrings.fontFamily,
@@ -449,7 +449,7 @@ class _DevRequestBodyFieldState extends State<_DevRequestBodyField> {
           fontSize: 13,
         ),
         decoration: InputDecoration(
-          hintText: 'Request body (JSON)...',
+          hintText: AppStrings.devRequestBodyHint,
           hintStyle: TextStyle(
             color: AppTheme.hint(isLight),
             fontFamily: AppStrings.fontFamily,
@@ -524,7 +524,7 @@ class _DevSendButton extends StatelessWidget {
                     Icon(Icons.send, size: 18),
                     AppSpaces.h8,
                     Text(
-                      'SEND REQUEST',
+                      AppStrings.sendRequest,
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: AppStrings.fontFamily,
@@ -589,7 +589,7 @@ class _DevTerminalHeader extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                'Response Terminal',
+                AppStrings.responseTerminalTitle,
                 style: TextStyle(
                   color: AppTheme.subtext(isLight),
                   fontFamily: AppStrings.fontFamily,
