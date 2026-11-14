@@ -18,77 +18,74 @@ class SettingsDrawer extends StatelessWidget {
       builder: (final BuildContext context, final ThemeState state) {
         final bool isLight = state.isLightMode;
         return Drawer(
-          child: Container(
-            color: AppTheme.panel(isLight),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          AppStrings.settingsTitle,
-                          style: GoogleFonts.jetBrainsMono(
-                            color: AppTheme.primary(isLight),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+          backgroundColor: AppTheme.panel(isLight),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        AppStrings.settingsTitle,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: AppTheme.primary(isLight),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
-                        AppSpaces.v8,
-                        Divider(color: AppTheme.border(isLight)),
-                      ],
+                      ),
+                      AppSpaces.v8,
+                      Divider(color: AppTheme.border(isLight)),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    AppStrings.lightModeLabel,
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppTheme.subtext(isLight),
+                      fontSize: 14,
                     ),
                   ),
+                  trailing: const _AsciiToggle(),
+                ),
+                if (kDebugMode) ...<Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(color: AppTheme.border(isLight)),
+                  ),
                   ListTile(
+                    leading: Icon(
+                      Icons.bug_report_outlined,
+                      color: AppTheme.primary(isLight),
+                      size: 18,
+                    ),
                     title: Text(
-                      AppStrings.lightModeLabel,
+                      AppStrings.devToolsLabel,
                       style: GoogleFonts.jetBrainsMono(
                         color: AppTheme.subtext(isLight),
                         fontSize: 14,
                       ),
                     ),
-                    trailing: const _AsciiToggle(),
-                  ),
-                  if (kDebugMode) ...<Widget>[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(color: AppTheme.border(isLight)),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.muted(isLight),
+                      size: 18,
                     ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.bug_report_outlined,
-                        color: AppTheme.primary(isLight),
-                        size: 18,
-                      ),
-                      title: Text(
-                        AppStrings.devToolsLabel,
-                        style: GoogleFonts.jetBrainsMono(
-                          color: AppTheme.subtext(isLight),
-                          fontSize: 14,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder:
+                              (final BuildContext context) => const DevScreen(),
                         ),
-                      ),
-                      trailing: Icon(
-                        Icons.chevron_right,
-                        color: AppTheme.muted(isLight),
-                        size: 18,
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder:
-                                (final BuildContext context) =>
-                                    const DevScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         );
